@@ -3,15 +3,13 @@ import unittest, rostest
 import rosnode, rospy
 import time
 from pimouse_ros.msg import MotorFreqs
-from pimouse_ros.srv import TimedMotion
 from geometry_msgs.msg import Twist
 from std_srvs.stv import Trigger, TriggerResponse
 
 class MotorTest(unittest.TestCase):
-  def setUp(self):
+  def setup(self):
     rospy.wait_for_service("/motor_on")
     rospy.wait_for_service("/motor_off")
-    rospy.wait_for_service("/timed_motion")
     on = rospy.ServiceProxy("/motor_on", Trigger)
     ret = on()
 
@@ -59,13 +57,6 @@ class MotorTest(unittest.TestCase):
     with open("/dev/rtmotoren0", "r") as f:
       data = f.readline()
       self.assertEqual(data, "1\n", "wrong value in rtmotor0 at motor on")
-
-  def test_put_value_timed(self):
-    tm = rospy.ServiceProxy("/motor_on", Trigger)
-    tm(-321,654,1500)
-    with open("/dev/rtmotor0", "r") as f:
-      data = f.readline()
-      self.assertEqual(data, "-321 654 1500\n", "value does not written to rtmotor0")
 
 if __name__ == "__main__":
   #time.sleep(3)
